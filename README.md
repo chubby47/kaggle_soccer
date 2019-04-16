@@ -1,3 +1,3 @@
 # kaggle_soccer
 science first.
-devoirs maison 3I016 UPMC
+devoirs maison de L3 UPMC
