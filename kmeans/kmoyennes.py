@@ -126,7 +126,7 @@ def affiche_resultat(DataFnorm, les_centres, affect):
     plt.show()
 # -------
 
-def visualiser_clusters(dataf, clusters):
+def visualiser_clusters(dataf, clusters, title="clusters"):
     colors = ['red', 'green', 'blue', 'black', 'yellow', 'grey']
     a, b = dataf.shape
     nb_clusters = len(clusters)
@@ -145,5 +145,50 @@ def visualiser_clusters(dataf, clusters):
         y.append(row[1])
     for i in range(len(x)):
         plt.scatter(x[i], y[i], c=colors[labels[i]])
-    plt.title(str(nb_clusters)+" categories d'arrondissements de Paris en fonction de leur production de dechets")
+    plt.title(str(nb_clusters)+" "+title)
     plt.show()
+
+#--------
+
+def dist_intracluster(DF):
+    d = 0
+    for i in range(len(DF)):
+        for j in range(len(DF)):
+            if i == j:
+                continue
+            if dist_euclidienne_vect(DF.iloc[i], DF.iloc[j]) > d:
+                d = dist_euclidienne_vect(DF.iloc[i], DF.iloc[j])
+    return d
+
+#--------
+
+def global_intraclusters(df, affectation):
+    d = 0
+    for k in range(0,len(affectation)):
+        DF = df.iloc[affectation[k]]
+        tmp = dist_intracluster(DF)
+        if tmp > d:
+            d = tmp
+    return d
+
+#--------
+
+def sep_clusters(centres):
+	#mesure de séparabilité des clusters
+    d = 10000000
+    for i in range(len(centres)):
+        for j in range(len(centres)):
+            if i == j:
+                continue
+            if dist_euclidienne_vect(centres.iloc[i], centres.iloc[j]) < d:
+                d = dist_euclidienne_vect(centres.iloc[i], centres.iloc[j])
+    return d
+
+
+#--------
+
+def evaluation(df, centres, affectation, method="Dunn"):
+    if method == "Dunn":
+        return global_intraclusters(df, affectation) / sep_clusters(centres)
+    if method == "XB":
+        return inertie_globale(df, affectation) / sep_clusters(centres)
